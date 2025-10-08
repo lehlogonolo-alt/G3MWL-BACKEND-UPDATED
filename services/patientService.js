@@ -1,4 +1,5 @@
 const Patient = require('../models/Patient');
+const WeeklyReport = require('../models/WeeklyReport');
 
 // ✅ Fetch all patients
 async function getAllPatients() {
@@ -10,13 +11,18 @@ async function getAllPatients() {
   }
 }
 
-// ✅ Fetch a single patient by ID
+// ✅ Fetch a single patient by ID along with their weekly reports
 async function getPatientById(id) {
   try {
-    const patient = await Patient.findById(id);
+    const patient = await Patient.findById(id).lean(); // Use lean() for plain JS object
     if (!patient) {
       throw new Error('Patient not found');
     }
+
+    // Fetch all weekly reports for this patient
+    const reports = await WeeklyReport.find({ patientId: id }).sort({ weekNumber: 1 });
+    patient.WeeklyReports = reports;
+
     return patient;
   } catch (err) {
     console.error(`❌ Failed to fetch patient with ID ${id}:`, err);
@@ -33,8 +39,7 @@ async function createPatient(data) {
       age: data.age,
       gender: data.gender,
       treatmentStartDate: data.treatmentStartDate,
-      startingWeight: data.startingWeight,
-      WeeklyReports: [] // Initialize empty weekly reports array
+      startingWeight: data.startingWeight
     });
     await patient.save();
   } catch (err) {
@@ -46,18 +51,17 @@ async function createPatient(data) {
 // ✅ Add a weekly report to a patient
 async function addReport(patientId, report) {
   try {
-    const patient = await Patient.findById(patientId);
-    if (!patient) {
+    const patientExists = await Patient.exists({ _id: patientId });
+    if (!patientExists) {
       throw new Error('Patient not found');
     }
 
-    // Initialize WeeklyReports if undefined
-    if (!patient.WeeklyReports) {
-      patient.WeeklyReports = [];
-    }
+    const newReport = new WeeklyReport({
+      ...report,
+      patientId
+    });
 
-    patient.WeeklyReports.push(report);
-    await patient.save();
+    await newReport.save();
     return true;
   } catch (err) {
     console.error(`❌ Failed to add report for patient ${patientId}:`, err);
@@ -66,4 +70,3 @@ async function addReport(patientId, report) {
 }
 
 module.exports = { getAllPatients, getPatientById, createPatient, addReport };
-
