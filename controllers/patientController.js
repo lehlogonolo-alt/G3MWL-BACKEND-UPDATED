@@ -1,5 +1,6 @@
 const patientService = require('../services/patientService');
 
+// Get all patients
 async function getPatients(req, res) {
   try {
     const patients = await patientService.getAllPatients();
@@ -10,6 +11,27 @@ async function getPatients(req, res) {
   }
 }
 
+// Get a single patient by ID
+async function getPatientById(req, res) {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Patient ID is required' });
+  }
+
+  try {
+    const patient = await patientService.getPatientById(id);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    res.json(patient);
+  } catch (err) {
+    console.error('❌ Failed to fetch patient by ID:', err);
+    res.status(500).json({ error: 'Could not retrieve patient' });
+  }
+}
+
+// Create a new patient
 async function createPatient(req, res) {
   const { firstName, lastName, age, gender, treatmentStartDate, startingWeight } = req.body;
 
@@ -33,5 +55,6 @@ async function createPatient(req, res) {
   }
 }
 
-module.exports = { getPatients, createPatient };
+module.exports = { getPatients, createPatient, getPatientById };
+
 
