@@ -12,5 +12,9 @@ router.get('/:id', auth, patientController.getPatientById);
 // Create a new patient
 router.post('/', auth, patientController.createPatient);
 
+// Add a new weekly report to a patient
+router.post('/:id/reports', auth, patientController.addReport);
+
 module.exports = router;
+
 
