@@ -26,7 +26,7 @@ async function getPatientById(req, res) {
     }
     res.json(patient);
   } catch (err) {
-    console.error('❌ Failed to fetch patient by ID:', err);
+    console.error(`❌ Failed to fetch patient by ID ${id}:`, err);
     res.status(500).json({ error: 'Could not retrieve patient' });
   }
 }
@@ -55,6 +55,31 @@ async function createPatient(req, res) {
   }
 }
 
-module.exports = { getPatients, createPatient, getPatientById };
+// Add a new weekly report to a patient
+async function addReport(req, res) {
+  const { id } = req.params;
+  const report = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Patient ID is required' });
+  }
+
+  if (!report || Object.keys(report).length === 0) {
+    return res.status(400).json({ error: 'Report data is required' });
+  }
+
+  try {
+    const success = await patientService.addReport(id, report);
+    if (!success) {
+      return res.status(500).json({ error: 'Failed to add report' });
+    }
+    res.status(201).json({ message: 'Report added successfully' });
+  } catch (err) {
+    console.error(`❌ Failed to add report for patient ${id}:`, err);
+    res.status(500).json({ error: 'Could not add report', details: err.message });
+  }
+}
+
+module.exports = { getPatients, createPatient, getPatientById, addReport };
 
 
