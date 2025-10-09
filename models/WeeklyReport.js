@@ -4,7 +4,7 @@ const WeeklyReportSchema = new mongoose.Schema({
   weekNumber: { type: Number, required: true },
   weight: Number,
   dosage: String,
-  sideEffects: String,
+  sideEffects: [String],
   results: String,
   notes: String,
   patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
