@@ -11,14 +11,18 @@ async function getSideEffects(req, res) {
 }
 
 async function createSideEffect(req, res) {
-  const { name } = req.body;
+  const { name, severity } = req.body;
 
   if (!name || typeof name !== 'string') {
     return res.status(400).json({ error: 'Side effect name is required and must be a string' });
   }
 
+  if (!['mild', 'moderate', 'severe'].includes(severity)) {
+    return res.status(400).json({ error: 'Severity must be mild, moderate, or severe' });
+  }
+
   try {
-    await sideEffectService.createSideEffect(name);
+    await sideEffectService.createSideEffect(name, severity);
     res.status(201).json({ message: 'Side effect added' });
   } catch (err) {
     console.error('❌ Failed to create side effect:', err);
@@ -27,4 +31,6 @@ async function createSideEffect(req, res) {
 }
 
 module.exports = { getSideEffects, createSideEffect };
+
+
 
