@@ -9,9 +9,9 @@ async function getAllSideEffects() {
   }
 }
 
-async function createSideEffect(name) {
+async function createSideEffect(name, severity) {
   try {
-    const sideEffect = new SideEffect({ name });
+    const sideEffect = new SideEffect({ name, severity });
     await sideEffect.save();
   } catch (err) {
     if (err.code === 11000 || err.message.includes('duplicate key')) {
@@ -23,3 +23,5 @@ async function createSideEffect(name) {
 }
 
 module.exports = { getAllSideEffects, createSideEffect };
+
+
