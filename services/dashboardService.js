@@ -1,4 +1,5 @@
 const Patient = require('../models/Patient');
+const WeeklyReport = require('../models/WeeklyReport');
 const SideEffect = require('../models/SideEffect');
 
 async function getDashboardData() {
@@ -6,20 +7,34 @@ async function getDashboardData() {
     const totalPatients = await Patient.countDocuments();
     const sideEffectCount = await SideEffect.countDocuments();
 
-    const weights = await Patient.aggregate([
-      { $match: { startingWeight: { $ne: null } } },
-      {
-        $group: {
-          _id: null,
-          averageStartingWeight: { $avg: '$startingWeight' }
-        }
+    const patients = await Patient.find({});
+    let totalPercentageLost = 0;
+    let patientsWithWeightLoss = 0;
+
+    for (const patient of patients) {
+      if (!patient.startingWeight || patient.startingWeight <= 0) continue;
+
+      const latestReport = await WeeklyReport.findOne({
+        patientId: patient._id,
+        weight: { $ne: null }
+      }).sort({ weekNumber: -1 });
+
+      if (latestReport && latestReport.weight > 0) {
+        const weightLost = patient.startingWeight - latestReport.weight;
+        const percentageLost = (weightLost / patient.startingWeight) * 100;
+        totalPercentageLost += percentageLost;
+        patientsWithWeightLoss++;
       }
-    ]);
+    }
+
+    const averageWeightLossPercentage = patientsWithWeightLoss > 0
+      ? parseFloat((totalPercentageLost / patientsWithWeightLoss).toFixed(1))
+      : 0;
 
     return {
       totalPatients,
       sideEffectCount,
-      averageStartingWeight: weights[0]?.averageStartingWeight || 0
+      averageWeightLossPercentage
     };
   } catch (err) {
     console.error('❌ Failed to fetch dashboard data:', err);
@@ -28,3 +43,5 @@ async function getDashboardData() {
 }
 
 module.exports = { getDashboardData };
+
+
