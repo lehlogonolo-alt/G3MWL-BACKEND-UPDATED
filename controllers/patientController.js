@@ -80,6 +80,34 @@ async function addReport(req, res) {
   }
 }
 
-module.exports = { getPatients, createPatient, getPatientById, addReport };
+// Delete a patient by ID
+async function deletePatient(req, res) {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Patient ID is required' });
+  }
+
+  try {
+    const success = await patientService.deletePatient(id);
+    if (!success) {
+      return res.status(404).json({ error: 'Patient not found or already deleted' });
+    }
+    res.json({ message: 'Patient deleted successfully' });
+  } catch (err) {
+    console.error(`❌ Failed to delete patient ${id}:`, err);
+    res.status(500).json({ error: 'Could not delete patient', details: err.message });
+  }
+}
+
+module.exports = {
+  getPatients,
+  createPatient,
+  getPatientById,
+  addReport,
+  deletePatient
+};
+
+
 
 
