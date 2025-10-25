@@ -69,4 +69,26 @@ async function addReport(patientId, report) {
   }
 }
 
-module.exports = { getAllPatients, getPatientById, createPatient, addReport };
+// ✅ Delete a patient and their reports
+async function deletePatient(id) {
+  try {
+    const deleted = await Patient.findByIdAndDelete(id);
+    if (!deleted) {
+      return false;
+    }
+
+    await WeeklyReport.deleteMany({ patientId: id });
+    return true;
+  } catch (err) {
+    console.error(`❌ Failed to delete patient ${id}:`, err);
+    throw new Error('Could not delete patient');
+  }
+}
+
+module.exports = {
+  getAllPatients,
+  getPatientById,
+  createPatient,
+  addReport,
+  deletePatient
+};
