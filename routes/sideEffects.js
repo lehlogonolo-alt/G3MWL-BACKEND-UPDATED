@@ -5,5 +5,8 @@ const auth = require('../middleware/auth');
 
 router.get('/', auth, sideEffectController.getSideEffects);
 router.post('/', auth, sideEffectController.createSideEffect);
+router.delete('/:id', auth, sideEffectController.deleteSideEffect); 
 
 module.exports = router;
+
+
