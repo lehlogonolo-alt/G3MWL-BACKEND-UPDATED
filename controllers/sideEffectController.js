@@ -30,7 +30,28 @@ async function createSideEffect(req, res) {
   }
 }
 
-module.exports = { getSideEffects, createSideEffect };
+async function deleteSideEffect(req, res) {
+  const { id } = req.params;
+
+  try {
+    const success = await sideEffectService.deleteSideEffect(id);
+    if (!success) {
+      return res.status(404).json({ error: 'Side effect not found' });
+    }
+
+    res.status(200).json({ message: 'Side effect deleted successfully' });
+  } catch (err) {
+    console.error('❌ Failed to delete side effect:', err);
+    res.status(500).json({ error: err.message || 'Could not delete side effect' });
+  }
+}
+
+module.exports = {
+  getSideEffects,
+  createSideEffect,
+  deleteSideEffect
+};
+
 
 
 
