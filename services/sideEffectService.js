@@ -22,6 +22,25 @@ async function createSideEffect(name, severity) {
   }
 }
 
-module.exports = { getAllSideEffects, createSideEffect };
+async function deleteSideEffect(id) {
+  try {
+    const deleted = await SideEffect.findByIdAndDelete(id);
+    if (!deleted) {
+      throw new Error('Side effect not found');
+    }
+    return true;
+  } catch (err) {
+    console.error('❌ Failed to delete side effect:', err);
+    throw new Error('Could not delete side effect');
+  }
+}
+
+module.exports = {
+  getAllSideEffects,
+  createSideEffect,
+  deleteSideEffect
+};
+
+
 
 
