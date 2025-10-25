@@ -15,6 +15,11 @@ router.post('/', auth, patientController.createPatient);
 // Add a new weekly report to a patient
 router.post('/:id/reports', auth, patientController.addReport);
 
+// Delete a patient by ID
+router.delete('/:id', auth, patientController.deletePatient);
+
 module.exports = router;
+
+
 
 
