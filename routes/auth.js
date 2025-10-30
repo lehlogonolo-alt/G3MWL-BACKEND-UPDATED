@@ -3,14 +3,17 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const auth = require('../middleware/auth'); // 🔐 JWT middleware
 
-//  Auth Routes
+// 🔐 Auth Routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/google-login', authController.googleLogin);
 
-//  Change Password (requires token)
+// 🔐 Change Password (requires token)
 router.put('/change-password', auth, authController.changePassword);
 
 module.exports = router;
+
+
 
 
 
