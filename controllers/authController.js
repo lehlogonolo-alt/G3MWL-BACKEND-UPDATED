@@ -55,6 +55,29 @@ async function login(req, res) {
   }
 }
 
-module.exports = { register, login };
+async function changePassword(req, res) {
+  const { currentPassword, newPassword } = req.body;
+  const email = req.user?.email;
+
+  if (!email || !currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    await userService.changePassword(email, currentPassword, newPassword);
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('❌ Change password failed:', err.message);
+    res.status(400).json({ error: err.message });
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  changePassword
+};
+
+
 
 
