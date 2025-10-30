@@ -9,11 +9,10 @@ async function createUser(email, password) {
     await user.save();
     return { email };
   } catch (err) {
-    // MongoDB duplicate key error code is 11000
     if (err.code === 11000 || err.message.includes('duplicate key')) {
       throw new Error('Email already exists');
     }
-    throw err; // re-throw other errors
+    throw err;
   }
 }
 
@@ -21,7 +20,26 @@ async function findUserByEmail(email) {
   return await User.findOne({ email });
 }
 
-module.exports = { createUser, findUserByEmail };
+async function changePassword(email, currentPassword, newPassword) {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('User not found');
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) throw new Error('Incorrect current password');
+
+  const hashedNew = await bcrypt.hash(newPassword, 10);
+  user.password = hashedNew;
+  await user.save();
+  return { message: 'Password updated successfully' };
+}
+
+module.exports = {
+  createUser,
+  findUserByEmail,
+  changePassword
+};
+
+
 
 
 
